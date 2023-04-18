@@ -1,0 +1,47 @@
+version: '2'
+services:
+    node1:
+        image: bitnami/cassandra:4.0.8
+        container_name: cass_node1
+        hostname: node1
+        # Задаем статический ip адрес
+        networks:
+            cassandra_net:
+                ipv4_address: 172.30.0.2
+        # CASSANDRA_SEEDS - задаем связанность контейнеров в кластер
+        # CASSANDRA_CLUSTER_NAME - имя кластера
+        environment:
+            - CASSANDRA_SEEDS=node1,node2,node3
+            - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+        ports:
+            - 9042:9042
+    node2:
+        image: bitnami/cassandra:4.0.8
+        container_name: cass_node2
+        hostname: node2
+        networks:
+            cassandra_net:
+                ipv4_address: 172.30.0.3
+        environment:
+            - CASSANDRA_SEEDS=node1,node2,node3
+            - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+        ports:
+            - 9043:9042
+    node3:
+        image: bitnami/cassandra:4.0.8
+        container_name: cass_node3
+        hostname: node3
+        networks:
+            cassandra_net:
+                ipv4_address: 172.30.0.4
+        environment:
+            - CASSANDRA_SEEDS=node1,node2,node3
+            - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+        ports:
+            - 9044:9042
+networks:
+    cassandra_net:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.30.0.0/16
